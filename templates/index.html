@@ -599,6 +599,23 @@
                             </div>
                             
                             <div class="form-group">
+                                <div class="checkbox-item" style="margin-bottom: 1rem;">
+                                    <input type="checkbox" name="usar_intervalo_aleatorio" id="usar_intervalo_aleatorio" {% if status.usar_intervalo_aleatorio %}checked{% endif %}>
+                                    <span>Usar intervalo aleatório para postagem (anti-bot)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="intervalo_post_min">Intervalo mínimo (minutos):</label>
+                                <input type="number" name="intervalo_post_min" id="intervalo_post_min" min="1" value="{{ status.intervalo_post_min }}" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="intervalo_post_max">Intervalo máximo (minutos):</label>
+                                <input type="number" name="intervalo_post_max" id="intervalo_post_max" min="1" value="{{ status.intervalo_post_max }}" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
                                 <label class="form-label" for="opacidade">Opacidade da Imagem (<span id="opacidade-valor">{{ (status.opacidade * 100)|int }}</span>%)</label>
                                 <div class="slider-container">
                                     <input type="range" id="opacidade" name="opacidade" min="0" max="100" value="{{ (status.opacidade * 100)|int }}" class="slider" oninput="document.getElementById('opacidade-valor').innerText = this.value;">

@@ -5,6 +5,7 @@ import getpass
 import threading
 import logging
 import json
+import random
 import google.generativeai as genai
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -163,6 +164,37 @@ def postar_da_fila(item_id=None):
         
         # Remove da fila
         Database.remover_da_fila(item['id'])
+        
+        # Reagenda próximo post com intervalo aleatório
+        reagendar_proximo_post()
+
+def reagendar_proximo_post():
+    """Reagenda o próximo post com intervalo aleatório"""
+    cfg = carregar_config()
+    
+    if cfg.get("usar_intervalo_aleatorio", True):
+        min_intervalo = cfg.get("intervalo_post_min", 8)
+        max_intervalo = cfg.get("intervalo_post_max", 10)
+        intervalo_aleatorio = random.uniform(min_intervalo, max_intervalo)
+        
+        # Remove o job atual e cria um novo com intervalo aleatório
+        try:
+            scheduler.remove_job('postador_fila')
+        except:
+            pass
+        
+        scheduler.add_job(
+            postar_da_fila,
+            'interval',
+            minutes=intervalo_aleatorio,
+            id='postador_fila'
+        )
+        
+        logging.info(f"[SCHEDULER] Próximo post agendado para {intervalo_aleatorio:.1f} minutos")
+    else:
+        # Usa intervalo fixo
+        intervalo_fixo = cfg.get("intervalo_post", 30)
+        scheduler.reschedule_job('postador_fila', trigger='interval', minutes=intervalo_fixo)
 
 # --- ROTAS FLASK ---
 
@@ -240,15 +272,43 @@ def atualizar_config():
     # Atualiza intervalos e reagenda se necessário
     novo_intervalo_busca = int(request.form.get('intervalo_busca', 15))
     novo_intervalo_post = int(request.form.get('intervalo_post', 30))
+    novo_intervalo_post_min = int(request.form.get('intervalo_post_min', 8))
+    novo_intervalo_post_max = int(request.form.get('intervalo_post_max', 10))
+    usar_intervalo_aleatorio = 'usar_intervalo_aleatorio' in request.form
     
     if novo_intervalo_busca != cfg.get("intervalo_busca"):
         scheduler.reschedule_job('buscador_noticias', trigger='interval', minutes=novo_intervalo_busca)
     
-    if novo_intervalo_post != cfg.get("intervalo_post"):
-        scheduler.reschedule_job('postador_fila', trigger='interval', minutes=novo_intervalo_post)
+    # Atualiza configurações de postagem
+    if (novo_intervalo_post != cfg.get("intervalo_post") or 
+        novo_intervalo_post_min != cfg.get("intervalo_post_min") or
+        novo_intervalo_post_max != cfg.get("intervalo_post_max") or
+        usar_intervalo_aleatorio != cfg.get("usar_intervalo_aleatorio")):
+        
+        # Remove job atual
+        try:
+            scheduler.remove_job('postador_fila')
+        except:
+            pass
+        
+        # Cria novo job baseado na configuração
+        if usar_intervalo_aleatorio:
+            intervalo_inicial = random.uniform(novo_intervalo_post_min, novo_intervalo_post_max)
+        else:
+            intervalo_inicial = novo_intervalo_post
+        
+        scheduler.add_job(
+            postar_da_fila,
+            'interval',
+            minutes=intervalo_inicial,
+            id='postador_fila'
+        )
     
     cfg["intervalo_busca"] = novo_intervalo_busca
     cfg["intervalo_post"] = novo_intervalo_post
+    cfg["intervalo_post_min"] = novo_intervalo_post_min
+    cfg["intervalo_post_max"] = novo_intervalo_post_max
+    cfg["usar_intervalo_aleatorio"] = usar_intervalo_aleatorio
     
     salvar_config(cfg)
     logging.info("Configurações salvas.")
@@ -302,10 +362,19 @@ if __name__ == "__main__":
             minutes=config.get("intervalo_busca", 15), 
             id='buscador_noticias'
         )
+        # Configura agendamento de postagem
+        if config.get("usar_intervalo_aleatorio", True):
+            intervalo_inicial = random.uniform(
+                config.get("intervalo_post_min", 8),
+                config.get("intervalo_post_max", 10)
+            )
+        else:
+            intervalo_inicial = config.get("intervalo_post", 30)
+        
         scheduler.add_job(
             postar_da_fila, 
             'interval', 
-            minutes=config.get("intervalo_post", 30), 
+            minutes=intervalo_inicial, 
             id='postador_fila'
         )
         

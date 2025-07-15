@@ -45,11 +45,30 @@ class InstagramManager:
         try:
             logging.info(f"[INSTAGRAM] Iniciando upload da imagem...")
             
-            atraso = random.uniform(5, 10)
-            logging.info(f"Aguardando {atraso:.1f} segundos...")
-            time.sleep(atraso)
+            # Atraso aleatório inicial mais variado
+            atraso_inicial = random.uniform(3, 15)
+            logging.info(f"Aguardando {atraso_inicial:.1f} segundos...")
+            time.sleep(atraso_inicial)
+            
+            # Simulação de comportamento humano - às vezes verifica feed antes de postar
+            if random.random() < 0.3:  # 30% de chance
+                logging.info("[INSTAGRAM] Verificando feed antes de postar...")
+                try:
+                    self.client.get_timeline_feed()
+                    time.sleep(random.uniform(2, 5))
+                except:
+                    pass
+            
+            # Postagem com atraso adicional variado
+            atraso_pre_post = random.uniform(1, 4)
+            time.sleep(atraso_pre_post)
             
             self.client.photo_upload(caminho_imagem, legenda)
+            
+            # Atraso pós-postagem para simular comportamento humano
+            atraso_pos_post = random.uniform(2, 8)
+            time.sleep(atraso_pos_post)
+            
             logging.info("[INSTAGRAM] Postagem realizada com sucesso!")
             return True
             
