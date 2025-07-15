@@ -87,14 +87,14 @@ class NewsAPIs:
     @staticmethod
     def get_local_news():
         """
-        Busca notícias do banco SQLite local das últimas 5 horas
+        Busca notícias do banco SQLite local dos últimos 30 minutos
         """
         db_path = '/Users/davidgabriel/hubbots/scrapernews/articles.db'
         logging.info(f"[BUSCA] Buscando no banco SQLite local: {db_path}")
         
         try:
-            # Filtro temporal - últimas 5 horas
-            ponto_de_corte = datetime.now() - timedelta(hours=5)
+            # Filtro temporal - últimos 30 minutos
+            ponto_de_corte = datetime.now() - timedelta(minutes=30)
             ponto_de_corte_str = ponto_de_corte.strftime('%Y-%m-%d %H:%M:%S')
             
             # Conecta ao banco
@@ -108,7 +108,7 @@ class NewsAPIs:
             articles = cursor.fetchall()
             conn.close()
             
-            logging.info(f"[FILTRO] SQLite Local: {len(articles)} artigos encontrados (últimas 5h).")
+            logging.info(f"[FILTRO] SQLite Local: {len(articles)} artigos encontrados (últimos 30min).")
             
             return [{
                 "title": article["title"],
