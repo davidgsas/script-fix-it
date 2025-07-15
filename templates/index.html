@@ -518,7 +518,7 @@
                         <div>
                             <div class="form-group">
                                 <label class="form-label">Fontes de Notícias:</label>
-                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="checkbox-item">
                                         <input type="checkbox" name="apis" value="gnews" {% if 'gnews' in status.apis_ativas %}checked{% endif %}>
                                         <span>GNews.io</span>
@@ -526,6 +526,10 @@
                                     <div class="checkbox-item">
                                         <input type="checkbox" name="apis" value="newsdata" {% if 'newsdata' in status.apis_ativas %}checked{% endif %}>
                                         <span>NewsData.io</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="apis" value="local_db" {% if 'local_db' in status.apis_ativas %}checked{% endif %}>
+                                        <span>Base Local</span>
                                     </div>
                                 </div>
                             </div>
