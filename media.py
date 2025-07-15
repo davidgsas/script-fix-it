@@ -51,41 +51,25 @@ class MediaProcessor:
             scale_x = W / img_w
             scale_y = H / img_h
             
-            # Usar o maior fator de escala para garantir que a imagem cubra todo o target
-            # Isso pode resultar em crop, mas evita distorção
+            # SEMPRE usar o maior fator de escala para garantir cobertura total
+            # Isso evita bordas pretas, mesmo que resulte em crop
             scale = max(scale_x, scale_y)
-            
-            # Permitir redução de até 20% se necessário para melhor ajuste
-            if scale > 1.2:
-                scale = 1.2
-            elif scale < 0.8:
-                scale = 0.8
             
             # Calcular novas dimensões mantendo proporção
             new_w = int(img_w * scale)
             new_h = int(img_h * scale)
             
-            # Redimensionar a imagem SEM distorção
+            # Redimensionar a imagem
             img_fundo = img_fundo.resize((new_w, new_h), Image.Resampling.LANCZOS)
             
-            # Criar imagem final e centralizar com crop
-            img_final = Image.new('RGBA', (W, H), (0, 0, 0, 255))
+            # Fazer crop centralizado para garantir dimensões exatas
+            crop_x = max(0, (new_w - W) // 2)
+            crop_y = max(0, (new_h - H) // 2)
+            img_fundo = img_fundo.crop((crop_x, crop_y, crop_x + W, crop_y + H))
             
-            # Calcular posição para centralizar
-            x_offset = (W - new_w) // 2
-            y_offset = (H - new_h) // 2
-            
-            # Se a imagem redimensionada for maior que o alvo, fazer crop centralizado
-            if new_w > W or new_h > H:
-                crop_x = max(0, (new_w - W) // 2)
-                crop_y = max(0, (new_h - H) // 2)
-                img_fundo = img_fundo.crop((crop_x, crop_y, crop_x + W, crop_y + H))
-                x_offset = 0
-                y_offset = 0
-            
-            # Colar a imagem centralizada
-            img_final.paste(img_fundo, (x_offset, y_offset))
-            img_fundo = img_final
+            # Garantir que a imagem final tenha exatamente as dimensões corretas
+            if img_fundo.size != (W, H):
+                img_fundo = img_fundo.resize((W, H), Image.Resampling.LANCZOS)
             
         except Exception as e:
             logging.error(f"[IMAGEM] Falha ao carregar imagem {url_imagem}. Erro: {e}")
