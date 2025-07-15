@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Posts e Curadoria</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            background: linear-gradient(135deg, #f8f9ff, #e8edff);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .stat-item h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e1e5e9;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+        
+        tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .col-titulo { width: 25%; }
+        .col-conteudo { width: 35%; }
+        .col-fonte { width: 10%; }
+        .col-idioma { width: 8%; }
+        .col-status { width: 12%; }
+        .col-data { width: 10%; }
+        
+        .content-box {
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            max-height: 100px;
+            overflow-y: auto;
+            border-left: 3px solid #e1e5e9;
+        }
+        
+        .content-box.original {
+            border-left-color: #6c757d;
+        }
+        
+        .content-box.reescrito {
+            border-left-color: #667eea;
+        }
+        
+        .status {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .status.postado {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.rejeitada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.falha {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .motivo {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-history"></i> Histórico de Processamento</h1>
+            <a href="/" class="btn">
+                <i class="fas fa-arrow-left"></i> Voltar ao Painel
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <h3>Total de Itens</h3>
+                    <div class="value" id="total-items">{{ historico|length }}</div>
+                </div>
+                <div class="stat-item">
+                    <h3>Posts Realizados</h3>
+                    <div class="value" id="posts-realizados">
+                        {{ historico|selectattr("status", "equalto", "POSTADO")|list|length }}
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <h3>Rejeitados</h3>
+                    <div class="value" id="rejeitados">
+                        {{ historico|selectattr("status", "equalto", "REJEITADA")|list|length }}
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <h3>Falhas</h3>
+                    <div class="value" id="falhas">
+                        {{ historico|selectattr("status", "equalto", "FALHA")|list|length }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" class="search-input" id="search-input" placeholder="🔍 Buscar por título, conteúdo ou fonte...">
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="todos">
+                    <i class="fas fa-list"></i> Todos
+                </button>
+                <button class="filter-btn" data-filter="POSTADO">
+                    <i class="fas fa-check-circle"></i> Postados
+                </button>
+                <button class="filter-btn" data-filter="REJEITADA">
+                    <i class="fas fa-times-circle"></i> Rejeitados
+                </button>
+                <button class="filter-btn" data-filter="FALHA">
+                    <i class="fas fa-exclamation-triangle"></i> Falhas
+                </button>
+            </div>
+            
+            <div class="table-container">
+                {% if historico %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-titulo">Título (DE/PARA)</th>
+                            <th class="col-conteudo">Conteúdo (DE/PARA)</th>
+                            <th class="col-fonte">Fonte API</th>
+                            <th class="col-idioma">Idioma</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-data">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historico-tbody">
+                        {% for post in historico %}
+                        <tr data-status="{{ post.status }}" data-search="{{ (post.titulo_original + ' ' + post.titulo_refinado + ' ' + (post.conteudo_original or '') + ' ' + (post.conteudo_reescrito or '') + ' ' + post.api_fonte)|lower }}">
+                            <td>
+                                <strong>Original:</strong>
+                                <div class="content-box original">{{ post.titulo_original or 'N/A' }}</div>
+                                <strong style="margin-top: 10px; display: block;">Refinado:</strong>
+                                <div class="content-box reescrito">{{ post.titulo_refinado or 'N/A' }}</div>
+                            </td>
+                            <td>
+                                <strong>Original:</strong>
+                                <div class="content-box original">{{ post.conteudo_original or 'Sem conteúdo' }}</div>
+                                <strong style="margin-top: 10px; display: block;">Reescrito:</strong>
+                                <div class="content-box reescrito">{{ post.conteudo_reescrito or 'N/A' }}</div>
+                            </td>
+                            <td>
+                                <span style="text-transform: uppercase; font-weight: 600;">{{ post.api_fonte }}</span>
+                            </td>
+                            <td>
+                                <span style="text-transform: uppercase; font-weight: 600;">{{ post.idioma_original }}</span>
+                            </td>
+                            <td>
+                                <span class="status {{ post.status.lower() }}">{{ post.status }}</span>
+                                {% if post.motivo_rejeicao %}
+                                <div class="motivo">{{ post.motivo_rejeicao }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ post.data_formatada }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Nenhum item no histórico</h3>
+                    <p>Quando o sistema processar notícias, elas aparecerão aqui.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filtros de status
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active de todos
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                // Adiciona active no clicado
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                const rows = document.querySelectorAll('#historico-tbody tr');
+                
+                rows.forEach(row => {
+                    if (filter === 'todos' || row.dataset.status === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Aplica busca também
+                applySearch();
+            });
+        });
+        
+        // Busca
+        document.getElementById('search-input').addEventListener('input', applySearch);
+        
+        function applySearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const rows = document.querySelectorAll('#historico-tbody tr');
+            
+            rows.forEach(row => {
+                const searchText = row.dataset.search;
+                const status = row.dataset.status;
+                
+                const matchesFilter = activeFilter === 'todos' || status === activeFilter;
+                const matchesSearch = searchTerm === '' || searchText.includes(searchTerm);
+                
+                if (matchesFilter && matchesSearch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Auto-refresh a cada 30 segundos
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

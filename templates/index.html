@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Comando de Conteúdo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-item {
+            background: linear-gradient(135deg, #f8f9ff, #e8edff);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .status-item h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-item .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .config-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .slider-container {
+            margin-top: 0.5rem;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e1e5e9;
+            outline: none;
+            transition: background 0.3s;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+        
+        .btn-save {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .queue-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e1e5e9;
+            vertical-align: middle;
+        }
+        
+        tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .log-container {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            height: 300px;
+            overflow-y: auto;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .log-line {
+            margin-bottom: 4px;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .config-section { grid-template-columns: 1fr; }
+            .status-grid { grid-template-columns: 1fr; }
+            .checkbox-grid { grid-template-columns: 1fr; }
+            .queue-header { flex-direction: column; gap: 1rem; }
+            .queue-actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Centro de Comando de Conteúdo</h1>
+            <p>Painel de controle automatizado para gestão de conteúdo do Instagram</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Status do Sistema</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <h3>Instagram</h3>
+                        <div class="value" id="status-conexao">...</div>
+                    </div>
+                    <div class="status-item">
+                        <h3>Fila de Posts</h3>
+                        <div class="value" id="status-fila">0</div>
+                    </div>
+                    <div class="status-item">
+                        <h3>Custo Sessão</h3>
+                        <div class="value" id="custo-sessao">$0.00</div>
+                    </div>
+                    <div class="status-item">
+                        <h3>Custo Total</h3>
+                        <div class="value" id="custo-total">$0.00</div>
+                    </div>
+                    <div class="status-item">
+                        <h3>Próxima Busca</h3>
+                        <div class="value" id="status-busca" style="font-size: 1.2rem;">...</div>
+                    </div>
+                    <div class="status-item">
+                        <h3>Próximo Post</h3>
+                        <div class="value" id="status-post" style="font-size: 1.2rem;">...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-cog"></i> Configurações</h2>
+                <form action="/atualizar_config" method="post">
+                    <div class="config-section">
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">Fontes de Notícias:</label>
+                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr;">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="apis" value="gnews" {% if 'gnews' in status.apis_ativas %}checked{% endif %}>
+                                        <span>GNews.io</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="apis" value="newsdata" {% if 'newsdata' in status.apis_ativas %}checked{% endif %}>
+                                        <span>NewsData.io</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Categorias de Interesse:</label>
+                                <div class="checkbox-grid">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="technology" {% if 'technology' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Tecnologia</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="entertainment" {% if 'entertainment' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Entretenimento</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="sports" {% if 'sports' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Esportes</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="business" {% if 'business' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Negócios</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="science" {% if 'science' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Ciência</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="health" {% if 'health' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Saúde</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="politics" {% if 'politics' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Política</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="categorias" value="world" {% if 'world' in status.categorias_ativas %}checked{% endif %}>
+                                        <span>Mundo</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Idiomas da Busca:</label>
+                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr;">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="idiomas" value="pt" {% if 'pt' in status.idiomas_busca %}checked{% endif %}>
+                                        <span>Português (Brasil)</span>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" name="idiomas" value="en" {% if 'en' in status.idiomas_busca %}checked{% endif %}>
+                                        <span>Inglês (EUA)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label" for="intervalo_busca">Busca automática (minutos):</label>
+                                <input type="number" name="intervalo_busca" id="intervalo_busca" min="1" value="{{ status.intervalo_busca }}" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="intervalo_post">Postagem automática (minutos):</label>
+                                <input type="number" name="intervalo_post" id="intervalo_post" min="1" value="{{ status.intervalo_post }}" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="opacidade">Opacidade da Imagem (<span id="opacidade-valor">{{ (status.opacidade * 100)|int }}</span>%)</label>
+                                <div class="slider-container">
+                                    <input type="range" id="opacidade" name="opacidade" min="0" max="100" value="{{ (status.opacidade * 100)|int }}" class="slider" oninput="document.getElementById('opacidade-valor').innerText = this.value;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-save">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="queue-header">
+                <h2><i class="fas fa-list"></i> Fila de Postagem</h2>
+                <div class="queue-actions">
+                    <a href="/historico" class="btn btn-secondary">
+                        <i class="fas fa-history"></i> Ver Histórico
+                    </a>
+                    <form action="/limpar_fila" method="post" style="display: inline-block;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Limpar Fila
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título da Notícia</th>
+                            <th>Fonte API</th>
+                            <th>Categoria (IA)</th>
+                            <th style="width: 220px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fila-tbody">
+                        <!-- Conteúdo carregado via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-terminal"></i> Log de Atividades</h2>
+            <div class="log-container" id="log-container">
+                <!-- Logs carregados via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function atualizarStatus(dados) {
+            // Atualiza status
+            document.getElementById('status-conexao').innerText = dados.conexao_insta;
+            document.getElementById('status-fila').innerText = dados.fila_de_noticias.length;
+            document.getElementById('status-busca').innerText = dados.proxima_busca;
+            document.getElementById('status-post').innerText = dados.proximo_post;
+            document.getElementById('custo-sessao').innerText = '$' + (dados.custo_sessao.total_custo_usd || 0).toFixed(6);
+            document.getElementById('custo-total').innerText = '$' + (dados.custo_total || 0).toFixed(6);
+            
+            // Atualiza fila
+            const tbody = document.getElementById('fila-tbody');
+            tbody.innerHTML = '';
+            
+            if (dados.fila_de_noticias.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Nenhuma notícia na fila</td></tr>';
+            } else {
+                dados.fila_de_noticias.forEach(function(item) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.titulo || 'Título indisponível'}</td>
+                        <td>${item.api_fonte || 'N/A'}</td>
+                        <td>${item.categoria_ia || 'N/A'}</td>
+                        <td>
+                            <form action="/postar_item/${item.id}" method="post" style="display: inline-block; margin-right: 8px;">
+                                <button type="submit" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">
+                                    <i class="fas fa-share"></i> Postar
+                                </button>
+                            </form>
+                            <form action="/reprovar_item/${item.id}" method="post" style="display: inline-block;">
+                                <button type="submit" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;">
+                                    <i class="fas fa-times"></i> Reprovar
+                                </button>
+                            </form>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            
+            // Atualiza logs
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '';
+            
+            if (dados.log_recente && dados.log_recente.length > 0) {
+                dados.log_recente.forEach(function(linha) {
+                    const div = document.createElement('div');
+                    div.className = 'log-line';
+                    div.textContent = linha;
+                    logContainer.appendChild(div);
+                });
+            } else {
+                logContainer.innerHTML = '<div class="log-line">Nenhum log disponível</div>';
+            }
+            
+            // Auto-scroll para o final dos logs
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/status_update');
+                const dados = await response.json();
+                atualizarStatus(dados);
+            } catch (error) {
+                console.error("Erro ao buscar status:", error);
+            }
+        }
+        
+        // Atualiza a cada 3 segundos
+        setInterval(fetchStatus, 3000);
+        
+        // Carrega status inicial
+        fetchStatus();
+    </script>
+</body>
+</html>
