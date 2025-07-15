@@ -398,6 +398,16 @@
                 <h3><i class="fas fa-activity"></i> Fila de Posts</h3>
                 <div class="value" id="status-fila">0</div>
             </div>
+            
+            <div class="status-card">
+                <h3><i class="fas fa-dollar-sign"></i> Custo Sessão</h3>
+                <div class="value" id="custo-sessao" style="font-size: 1.2rem;">$0.000</div>
+            </div>
+            
+            <div class="status-card">
+                <h3><i class="fas fa-chart-line"></i> Custo Total</h3>
+                <div class="value" id="custo-total" style="font-size: 1.2rem;">$0.000</div>
+            </div>
         </div>
         
         <div class="main-content">
@@ -405,16 +415,6 @@
             <div class="card">
                 <h2><i class="fas fa-cog"></i> Configurações</h2>
                 <form action="/atualizar_config" method="post">
-                    <div class="form-group">
-                        <label class="form-label">News API Key:</label>
-                        <input type="password" name="news_api_key" value="{{ config.news_api_key or '' }}" class="form-input" placeholder="Sua News API Key">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Gemini API Key:</label>
-                        <input type="password" name="gemini_api_key" value="{{ config.gemini_api_key or '' }}" class="form-input" placeholder="Sua Gemini API Key">
-                    </div>
-                    
                     <div class="form-group">
                         <label class="form-label">Termos de Busca:</label>
                         <input type="text" name="termos_busca" value="{{ config.termos_busca or 'tecnologia, inteligência artificial' }}" class="form-input" placeholder="tecnologia, IA, ciência">
@@ -424,6 +424,13 @@
                         <label class="form-label">Intervalo de Busca (min): <span id="busca-valor">{{ config.buscar_intervalo or 30 }}</span></label>
                         <div class="slider-container">
                             <input type="range" id="buscar_intervalo" name="buscar_intervalo" min="10" max="120" step="5" value="{{ config.buscar_intervalo or 30 }}" class="slider" oninput="document.getElementById('busca-valor').innerText = this.value;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Intervalo de Posts (min): <span id="post-valor">{{ config.postar_intervalo or 60 }}</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="postar_intervalo" name="postar_intervalo" min="30" max="240" step="15" value="{{ config.postar_intervalo or 60 }}" class="slider" oninput="document.getElementById('post-valor').innerText = this.value;">
                         </div>
                     </div>
                     
@@ -445,6 +452,14 @@
                                 <input type="checkbox" name="usar_gnews" {% if config.usar_gnews %}checked{% endif %}>
                                 <span>GNews</span>
                             </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="usar_currents" {% if config.usar_currents %}checked{% endif %}>
+                                <span>Currents API</span>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="usar_newsdata" {% if config.usar_newsdata %}checked{% endif %}>
+                                <span>NewsData</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -462,6 +477,9 @@
                         <button onclick="postarProximo()" class="btn btn-primary" id="btn-postar">
                             <i class="fas fa-play"></i> Postar Próximo
                         </button>
+                        <a href="/historico" class="btn btn-secondary">
+                            <i class="fas fa-history"></i> Histórico
+                        </a>
                         <form action="/limpar_fila" method="post" style="display: inline-block;">
                             <button type="submit" class="btn btn-danger">
                                 <i class="fas fa-trash"></i> Limpar Fila
@@ -546,6 +564,10 @@
             // Atualizar outros status
             document.getElementById('status-busca').textContent = dados.proxima_busca || '--:--';
             document.getElementById('status-fila').textContent = dados.fila_postagem || 0;
+            
+            // Atualizar custos com formatação correta
+            document.getElementById('custo-sessao').textContent = `$${(dados.custo_sessao || 0).toFixed(6)}`;
+            document.getElementById('custo-total').textContent = `$${(dados.custo_total || 0).toFixed(6)}`;
             
             // Atualizar fila de postagem
             if (dados.fila && dados.fila.length > 0) {
