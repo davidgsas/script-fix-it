@@ -3,48 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centro de Comando de Conteúdo</title>
+    <title>Centro de Comando - Instagram Auto</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
         }
         
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .header h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #00ff88, #00c4ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
         
         .header p {
-            color: #666;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 1.1rem;
         }
         
-        .dashboard {
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-card h3 {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-connected {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .status-disconnected {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+        
+        .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
@@ -52,56 +110,21 @@
         }
         
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .card h2 {
             font-size: 1.5rem;
             margin-bottom: 1.5rem;
-            color: #333;
+            color: #ffffff;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .status-item {
-            background: linear-gradient(135deg, #f8f9ff, #e8edff);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-        
-        .status-item h3 {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .status-item .value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .config-section {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
         }
         
         .form-group {
@@ -112,12 +135,33 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #333;
+            color: #ffffff;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 0.5rem;
             margin-bottom: 1rem;
         }
@@ -132,27 +176,13 @@
         }
         
         .checkbox-item:hover {
-            background-color: rgba(102, 126, 234, 0.1);
+            background-color: rgba(0, 255, 136, 0.1);
         }
         
         .checkbox-item input[type="checkbox"] {
             width: 18px;
             height: 18px;
-            accent-color: #667eea;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
+            accent-color: #00ff88;
         }
         
         .slider-container {
@@ -163,7 +193,7 @@
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: #e1e5e9;
+            background: rgba(255, 255, 255, 0.2);
             outline: none;
             transition: background 0.3s;
         }
@@ -173,7 +203,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #667eea;
+            background: #00ff88;
             cursor: pointer;
         }
         
@@ -189,21 +219,24 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            backdrop-filter: blur(10px);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: linear-gradient(135deg, #00ff88, #00c4ff);
+            color: #ffffff;
+            border: 1px solid rgba(0, 255, 136, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
         }
         
         .btn-danger {
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            color: white;
+            color: #ffffff;
+            border: 1px solid rgba(255, 107, 107, 0.3);
         }
         
         .btn-danger:hover {
@@ -212,8 +245,13 @@
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #5a6268);
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .btn-save {
@@ -221,7 +259,6 @@
             padding: 16px;
             font-size: 18px;
             margin-top: 1rem;
-            background: linear-gradient(135deg, #28a745, #20c997);
         }
         
         .queue-header {
@@ -237,10 +274,11 @@
         }
         
         .table-container {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         table {
@@ -249,8 +287,8 @@
         }
         
         th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: rgba(0, 255, 136, 0.2);
+            color: #ffffff;
             padding: 16px;
             text-align: left;
             font-weight: 600;
@@ -258,36 +296,66 @@
         
         td {
             padding: 16px;
-            border-bottom: 1px solid #e1e5e9;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             vertical-align: middle;
+            color: #ffffff;
         }
         
         tr:hover {
-            background-color: rgba(102, 126, 234, 0.05);
+            background-color: rgba(0, 255, 136, 0.05);
         }
         
         .log-container {
-            background: #1a1a1a;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
             padding: 1.5rem;
             margin-top: 2rem;
             font-family: 'Monaco', 'Menlo', monospace;
             font-size: 14px;
-            color: #00ff00;
+            color: #00ff88;
             height: 300px;
             overflow-y: auto;
-            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .log-line {
             margin-bottom: 4px;
             white-space: pre-wrap;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .log-timestamp {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        
+        .log-success {
+            color: #00ff88;
+        }
+        
+        .log-warning {
+            color: #ffaa00;
+        }
+        
+        .log-error {
+            color: #ff6b6b;
+        }
+        
+        .log-info {
+            color: #00c4ff;
+        }
+        
+        .refresh-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
         }
         
         @media (max-width: 768px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .config-section { grid-template-columns: 1fr; }
-            .status-grid { grid-template-columns: 1fr; }
+            .main-content { grid-template-columns: 1fr; }
+            .status-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
             .checkbox-grid { grid-template-columns: 1fr; }
             .queue-header { flex-direction: column; gap: 1rem; }
             .queue-actions { justify-content: center; }
@@ -296,254 +364,303 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-robot"></i> Centro de Comando de Conteúdo</h1>
-            <p>Painel de controle automatizado para gestão de conteúdo do Instagram</p>
+            <h1>
+                <i class="fab fa-instagram"></i>
+                Centro de Comando - Instagram Auto
+            </h1>
+            <p>Sistema de automação para posts no Instagram</p>
         </div>
         
-        <div class="dashboard">
-            <div class="card">
-                <h2><i class="fas fa-chart-line"></i> Status do Sistema</h2>
-                <div class="status-grid">
-                    <div class="status-item">
-                        <h3>Instagram</h3>
-                        <div class="value" id="status-conexao">...</div>
-                    </div>
-                    <div class="status-item">
-                        <h3>Fila de Posts</h3>
-                        <div class="value" id="status-fila">0</div>
-                    </div>
-                    <div class="status-item">
-                        <h3>Custo Sessão</h3>
-                        <div class="value" id="custo-sessao">$0.00</div>
-                    </div>
-                    <div class="status-item">
-                        <h3>Custo Total</h3>
-                        <div class="value" id="custo-total">$0.00</div>
-                    </div>
-                    <div class="status-item">
-                        <h3>Próxima Busca</h3>
-                        <div class="value" id="status-busca" style="font-size: 1.2rem;">...</div>
-                    </div>
-                    <div class="status-item">
-                        <h3>Próximo Post</h3>
-                        <div class="value" id="status-post" style="font-size: 1.2rem;">...</div>
-                    </div>
+        <!-- Status Cards -->
+        <div class="status-grid">
+            <div class="status-card">
+                <h3><i class="fab fa-instagram"></i> Instagram</h3>
+                <div class="status-badge" id="status-instagram">
+                    <span id="status-conexao">Verificando...</span>
                 </div>
             </div>
             
+            <div class="status-card">
+                <h3><i class="fas fa-brain"></i> Gemini AI</h3>
+                <div class="status-badge" id="status-gemini">
+                    <span id="status-ai">Verificando...</span>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <h3><i class="fas fa-clock"></i> Próxima Busca</h3>
+                <div class="value" id="status-busca">--:--</div>
+            </div>
+            
+            <div class="status-card">
+                <h3><i class="fas fa-activity"></i> Fila de Posts</h3>
+                <div class="value" id="status-fila">0</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Configurações -->
             <div class="card">
                 <h2><i class="fas fa-cog"></i> Configurações</h2>
                 <form action="/atualizar_config" method="post">
-                    <div class="config-section">
-                        <div>
-                            <div class="form-group">
-                                <label class="form-label">Fontes de Notícias:</label>
-                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr;">
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="apis" value="gnews" {% if 'gnews' in status.apis_ativas %}checked{% endif %}>
-                                        <span>GNews.io</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="apis" value="newsdata" {% if 'newsdata' in status.apis_ativas %}checked{% endif %}>
-                                        <span>NewsData.io</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Categorias de Interesse:</label>
-                                <div class="checkbox-grid">
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="technology" {% if 'technology' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Tecnologia</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="entertainment" {% if 'entertainment' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Entretenimento</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="sports" {% if 'sports' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Esportes</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="business" {% if 'business' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Negócios</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="science" {% if 'science' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Ciência</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="health" {% if 'health' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Saúde</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="politics" {% if 'politics' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Política</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="categorias" value="world" {% if 'world' in status.categorias_ativas %}checked{% endif %}>
-                                        <span>Mundo</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Idiomas da Busca:</label>
-                                <div class="checkbox-grid" style="grid-template-columns: 1fr 1fr;">
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="idiomas" value="pt" {% if 'pt' in status.idiomas_busca %}checked{% endif %}>
-                                        <span>Português (Brasil)</span>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" name="idiomas" value="en" {% if 'en' in status.idiomas_busca %}checked{% endif %}>
-                                        <span>Inglês (EUA)</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="form-group">
+                        <label class="form-label">News API Key:</label>
+                        <input type="password" name="news_api_key" value="{{ config.news_api_key or '' }}" class="form-input" placeholder="Sua News API Key">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Gemini API Key:</label>
+                        <input type="password" name="gemini_api_key" value="{{ config.gemini_api_key or '' }}" class="form-input" placeholder="Sua Gemini API Key">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Termos de Busca:</label>
+                        <input type="text" name="termos_busca" value="{{ config.termos_busca or 'tecnologia, inteligência artificial' }}" class="form-input" placeholder="tecnologia, IA, ciência">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Intervalo de Busca (min): <span id="busca-valor">{{ config.buscar_intervalo or 30 }}</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="buscar_intervalo" name="buscar_intervalo" min="10" max="120" step="5" value="{{ config.buscar_intervalo or 30 }}" class="slider" oninput="document.getElementById('busca-valor').innerText = this.value;">
                         </div>
-                        
-                        <div>
-                            <div class="form-group">
-                                <label class="form-label" for="intervalo_busca">Busca automática (minutos):</label>
-                                <input type="number" name="intervalo_busca" id="intervalo_busca" min="1" value="{{ status.intervalo_busca }}" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Opacidade da Imagem: <span id="opacidade-valor">{{ (config.opacidade or 0.6) * 100 | int }}</span>%</label>
+                        <div class="slider-container">
+                            <input type="range" id="opacidade" name="opacidade" min="0" max="100" value="{{ (config.opacidade or 0.6) * 100 | int }}" class="slider" oninput="document.getElementById('opacidade-valor').innerText = this.value;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Fontes de Notícias:</label>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="usar_news_api" {% if config.usar_news_api %}checked{% endif %}>
+                                <span>News API</span>
                             </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="intervalo_post">Postagem automática (minutos):</label>
-                                <input type="number" name="intervalo_post" id="intervalo_post" min="1" value="{{ status.intervalo_post }}" class="form-input">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="opacidade">Opacidade da Imagem (<span id="opacidade-valor">{{ (status.opacidade * 100)|int }}</span>%)</label>
-                                <div class="slider-container">
-                                    <input type="range" id="opacidade" name="opacidade" min="0" max="100" value="{{ (status.opacidade * 100)|int }}" class="slider" oninput="document.getElementById('opacidade-valor').innerText = this.value;">
-                                </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="usar_gnews" {% if config.usar_gnews %}checked{% endif %}>
+                                <span>GNews</span>
                             </div>
                         </div>
                     </div>
+                    
                     <button type="submit" class="btn btn-primary btn-save">
                         <i class="fas fa-save"></i> Salvar Configurações
                     </button>
                 </form>
             </div>
-        </div>
-        
-        <div class="card">
-            <div class="queue-header">
-                <h2><i class="fas fa-list"></i> Fila de Postagem</h2>
-                <div class="queue-actions">
-                    <a href="/historico" class="btn btn-secondary">
-                        <i class="fas fa-history"></i> Ver Histórico
-                    </a>
-                    <form action="/limpar_fila" method="post" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Limpar Fila
+            
+            <!-- Fila de Postagem -->
+            <div class="card">
+                <div class="queue-header">
+                    <h2><i class="fas fa-list"></i> Fila de Postagem</h2>
+                    <div class="queue-actions">
+                        <button onclick="postarProximo()" class="btn btn-primary" id="btn-postar">
+                            <i class="fas fa-play"></i> Postar Próximo
                         </button>
-                    </form>
+                        <form action="/limpar_fila" method="post" style="display: inline-block;">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Limpar Fila
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Categoria</th>
+                                <th>Fonte</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fila-posts">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.5);">
+                                    Carregando fila de postagem...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Título da Notícia</th>
-                            <th>Fonte API</th>
-                            <th>Categoria (IA)</th>
-                            <th style="width: 220px;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="fila-tbody">
-                        <!-- Conteúdo carregado via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
         </div>
         
+        <!-- Log de Atividades -->
         <div class="card">
             <h2><i class="fas fa-terminal"></i> Log de Atividades</h2>
             <div class="log-container" id="log-container">
-                <!-- Logs carregados via JavaScript -->
+                <div class="log-line">
+                    <span class="log-timestamp">00:00:00</span>
+                    <span class="log-info">Sistema iniciando...</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function atualizarStatus(dados) {
-            // Atualiza status
-            document.getElementById('status-conexao').innerText = dados.conexao_insta;
-            document.getElementById('status-fila').innerText = dados.fila_de_noticias.length;
-            document.getElementById('status-busca').innerText = dados.proxima_busca;
-            document.getElementById('status-post').innerText = dados.proximo_post;
-            document.getElementById('custo-sessao').innerText = '$' + (dados.custo_sessao.total_custo_usd || 0).toFixed(6);
-            document.getElementById('custo-total').innerText = '$' + (dados.custo_total || 0).toFixed(6);
-            
-            // Atualiza fila
-            const tbody = document.getElementById('fila-tbody');
-            tbody.innerHTML = '';
-            
-            if (dados.fila_de_noticias.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Nenhuma notícia na fila</td></tr>';
-            } else {
-                dados.fila_de_noticias.forEach(function(item) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${item.titulo || 'Título indisponível'}</td>
-                        <td>${item.api_fonte || 'N/A'}</td>
-                        <td>${item.categoria_ia || 'N/A'}</td>
-                        <td>
-                            <form action="/postar_item/${item.id}" method="post" style="display: inline-block; margin-right: 8px;">
-                                <button type="submit" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">
-                                    <i class="fas fa-share"></i> Postar
-                                </button>
-                            </form>
-                            <form action="/reprovar_item/${item.id}" method="post" style="display: inline-block;">
-                                <button type="submit" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;">
-                                    <i class="fas fa-times"></i> Reprovar
-                                </button>
-                            </form>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-            
-            // Atualiza logs
-            const logContainer = document.getElementById('log-container');
-            logContainer.innerHTML = '';
-            
-            if (dados.log_recente && dados.log_recente.length > 0) {
-                dados.log_recente.forEach(function(linha) {
-                    const div = document.createElement('div');
-                    div.className = 'log-line';
-                    div.textContent = linha;
-                    logContainer.appendChild(div);
-                });
-            } else {
-                logContainer.innerHTML = '<div class="log-line">Nenhum log disponível</div>';
-            }
-            
-            // Auto-scroll para o final dos logs
-            logContainer.scrollTop = logContainer.scrollHeight;
-        }
+        let statusData = {};
         
+        // Função para buscar status do sistema
         async function fetchStatus() {
             try {
                 const response = await fetch('/status_update');
-                const dados = await response.json();
-                atualizarStatus(dados);
+                const data = await response.json();
+                statusData = data;
+                atualizarStatus(data);
             } catch (error) {
-                console.error("Erro ao buscar status:", error);
+                console.error('Erro ao buscar status:', error);
             }
         }
         
-        // Atualiza a cada 3 segundos
-        setInterval(fetchStatus, 3000);
+        // Função para atualizar a interface com os dados do status
+        function atualizarStatus(dados) {
+            // Atualizar status do Instagram
+            const statusInstagram = document.getElementById('status-instagram');
+            const statusConexao = document.getElementById('status-conexao');
+            if (dados.instagram_logado) {
+                statusInstagram.className = 'status-badge status-connected';
+                statusConexao.textContent = 'Conectado';
+            } else {
+                statusInstagram.className = 'status-badge status-disconnected';
+                statusConexao.textContent = 'Desconectado';
+            }
+            
+            // Atualizar status do Gemini
+            const statusGemini = document.getElementById('status-gemini');
+            const statusAI = document.getElementById('status-ai');
+            if (dados.gemini_configurado) {
+                statusGemini.className = 'status-badge status-connected';
+                statusAI.textContent = 'Configurado';
+            } else {
+                statusGemini.className = 'status-badge status-disconnected';
+                statusAI.textContent = 'Não configurado';
+            }
+            
+            // Atualizar outros status
+            document.getElementById('status-busca').textContent = dados.proxima_busca || '--:--';
+            document.getElementById('status-fila').textContent = dados.fila_postagem || 0;
+            
+            // Atualizar fila de postagem
+            if (dados.fila && dados.fila.length > 0) {
+                atualizarFilaPostagem(dados.fila);
+            } else {
+                document.getElementById('fila-posts').innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.5);">
+                            Nenhum item na fila de postagem
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Atualizar logs
+            if (dados.logs && dados.logs.length > 0) {
+                atualizarLogs(dados.logs);
+            }
+        }
         
-        // Carrega status inicial
+        // Função para atualizar a fila de postagem
+        function atualizarFilaPostagem(fila) {
+            const tbody = document.getElementById('fila-posts');
+            tbody.innerHTML = '';
+            
+            fila.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.titulo}">
+                        ${item.titulo}
+                    </td>
+                    <td>
+                        <span style="background: rgba(0,255,136,0.2); color: #00ff88; padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">
+                            ${item.categoria || 'Sem categoria'}
+                        </span>
+                    </td>
+                    <td>${item.fonte || 'N/A'}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="postarItem(${item.id})" class="btn btn-primary" style="padding: 0.5rem; font-size: 0.8rem;">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button onclick="reprovarItem(${item.id})" class="btn btn-danger" style="padding: 0.5rem; font-size: 0.8rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Função para atualizar logs
+        function atualizarLogs(logs) {
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '';
+            
+            logs.slice(-20).reverse().forEach(log => {
+                const logLine = document.createElement('div');
+                logLine.className = 'log-line';
+                
+                const timestamp = document.createElement('span');
+                timestamp.className = 'log-timestamp';
+                timestamp.textContent = log.timestamp || new Date().toLocaleTimeString();
+                
+                const message = document.createElement('span');
+                message.className = `log-${log.type || 'info'}`;
+                message.textContent = log.message || log;
+                
+                logLine.appendChild(timestamp);
+                logLine.appendChild(message);
+                logContainer.appendChild(logLine);
+            });
+        }
+        
+        // Funções para ações da fila
+        async function postarProximo() {
+            try {
+                const response = await fetch('/postar_proximo', { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    fetchStatus(); // Atualizar status após postar
+                }
+            } catch (error) {
+                console.error('Erro ao postar:', error);
+            }
+        }
+        
+        async function postarItem(itemId) {
+            try {
+                const response = await fetch(`/postar_item/${itemId}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    fetchStatus(); // Atualizar status após postar
+                }
+            } catch (error) {
+                console.error('Erro ao postar item:', error);
+            }
+        }
+        
+        async function reprovarItem(itemId) {
+            try {
+                const response = await fetch(`/reprovar_item/${itemId}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    fetchStatus(); // Atualizar status após reprovar
+                }
+            } catch (error) {
+                console.error('Erro ao reprovar item:', error);
+            }
+        }
+        
+        // Inicializar e atualizar a cada 3 segundos
         fetchStatus();
+        setInterval(fetchStatus, 3000);
     </script>
 </body>
 </html>
