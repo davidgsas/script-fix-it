@@ -650,79 +650,181 @@
     </div>
 
     <script>
+        let ultimaAtualizacao = Date.now();
+        let contadorErros = 0;
+        
         function atualizarStatus(dados) {
-            // Atualiza status
-            document.getElementById('status-conexao').innerText = dados.conexao_insta;
-            document.getElementById('status-fila').innerText = dados.fila_de_noticias.length;
-            document.getElementById('status-busca').innerText = dados.proxima_busca;
-            document.getElementById('status-post').innerText = dados.proximo_post;
-            document.getElementById('custo-sessao').innerText = '$' + (dados.custo_sessao.total_custo_usd || 0).toFixed(6);
-            document.getElementById('custo-total').innerText = '$' + (dados.custo_total || 0).toFixed(6);
-            
-            // Atualiza fila
-            const tbody = document.getElementById('fila-tbody');
-            tbody.innerHTML = '';
-            
-            if (dados.fila_de_noticias.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Nenhuma notícia na fila</td></tr>';
-            } else {
-                dados.fila_de_noticias.forEach(function(item) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${item.titulo || 'Título indisponível'}</td>
-                        <td>${item.api_fonte || 'N/A'}</td>
-                        <td>${item.categoria_ia || 'N/A'}</td>
-                        <td>
-                            <form action="/postar_item/${item.id}" method="post" style="display: inline-block; margin-right: 8px;">
-                                <button type="submit" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">
-                                    <i class="fas fa-share"></i> Postar
-                                </button>
-                            </form>
-                            <form action="/reprovar_item/${item.id}" method="post" style="display: inline-block;">
-                                <button type="submit" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;">
-                                    <i class="fas fa-times"></i> Reprovar
-                                </button>
-                            </form>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+            try {
+                console.log('Atualizando status:', dados);
+                ultimaAtualizacao = Date.now();
+                contadorErros = 0;
+                
+                // Atualiza status com validação
+                if (dados.conexao_insta !== undefined) {
+                    document.getElementById('status-conexao').innerText = dados.conexao_insta;
+                }
+                
+                if (dados.fila_de_noticias !== undefined) {
+                    document.getElementById('status-fila').innerText = dados.fila_de_noticias.length || 0;
+                }
+                
+                if (dados.proxima_busca !== undefined) {
+                    document.getElementById('status-busca').innerText = dados.proxima_busca;
+                }
+                
+                if (dados.proximo_post !== undefined) {
+                    document.getElementById('status-post').innerText = dados.proximo_post;
+                }
+                
+                // Atualiza custos com validação
+                if (dados.custo_sessao && dados.custo_sessao.total_custo_usd !== undefined) {
+                    document.getElementById('custo-sessao').innerText = '$' + dados.custo_sessao.total_custo_usd.toFixed(6);
+                }
+                
+                if (dados.custo_total !== undefined) {
+                    document.getElementById('custo-total').innerText = '$' + dados.custo_total.toFixed(6);
+                }
+                
+                // Atualiza fila
+                atualizarFila(dados.fila_de_noticias || []);
+                
+                // Atualiza logs
+                atualizarLogs(dados.log_recente || []);
+                
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
             }
-            
-            // Atualiza logs
-            const logContainer = document.getElementById('log-container');
-            logContainer.innerHTML = '';
-            
-            if (dados.log_recente && dados.log_recente.length > 0) {
-                dados.log_recente.forEach(function(linha) {
-                    const div = document.createElement('div');
-                    div.className = 'log-line';
-                    div.textContent = linha;
-                    logContainer.appendChild(div);
-                });
-            } else {
-                logContainer.innerHTML = '<div class="log-line">Nenhum log disponível</div>';
+        }
+        
+        function atualizarFila(fila) {
+            try {
+                const tbody = document.getElementById('fila-tbody');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                if (fila.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Nenhuma notícia na fila</td></tr>';
+                } else {
+                    fila.forEach(function(item) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.titulo || 'Título indisponível'}</td>
+                            <td>${item.api_fonte || 'N/A'}</td>
+                            <td>${item.categoria_ia || 'N/A'}</td>
+                            <td>
+                                <form action="/postar_item/${item.id}" method="post" style="display: inline-block; margin-right: 8px;">
+                                    <button type="submit" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">
+                                        <i class="fas fa-share"></i> Postar
+                                    </button>
+                                </form>
+                                <form action="/reprovar_item/${item.id}" method="post" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;">
+                                        <i class="fas fa-times"></i> Reprovar
+                                    </button>
+                                </form>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar fila:', error);
             }
-            
-            // Auto-scroll para o final dos logs
-            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function atualizarLogs(logs) {
+            try {
+                const logContainer = document.getElementById('log-container');
+                if (!logContainer) return;
+                
+                // Limpa logs antigos apenas se houver novos logs
+                if (logs.length > 0) {
+                    logContainer.innerHTML = '';
+                    
+                    logs.forEach(function(linha) {
+                        const div = document.createElement('div');
+                        div.className = 'log-line';
+                        div.textContent = linha;
+                        logContainer.appendChild(div);
+                    });
+                    
+                    // Auto-scroll para o final dos logs
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                } else if (logContainer.children.length === 0) {
+                    logContainer.innerHTML = '<div class="log-line">Aguardando logs do sistema...</div>';
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar logs:', error);
+            }
         }
         
         async function fetchStatus() {
             try {
-                const response = await fetch('/status_update');
+                console.log('Fazendo fetch do status...');
+                
+                const response = await fetch('/status_update', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const dados = await response.json();
+                console.log('Dados recebidos:', dados);
+                
                 atualizarStatus(dados);
+                
             } catch (error) {
-                console.error("Erro ao buscar status:", error);
+                contadorErros++;
+                console.error(`Erro ao buscar status (tentativa ${contadorErros}):`, error);
+                
+                // Se muitos erros consecutivos, mostra aviso
+                if (contadorErros >= 5) {
+                    const logContainer = document.getElementById('log-container');
+                    if (logContainer) {
+                        logContainer.innerHTML = `<div class="log-line" style="color: #ff6b6b;">ERRO: Conexão com servidor perdida. Tentativa ${contadorErros}/∞</div>`;
+                    }
+                }
             }
         }
         
-        // Atualiza a cada 3 segundos
-        setInterval(fetchStatus, 3000);
+        // Função para verificar se o sistema está travado
+        function verificarSistema() {
+            const agora = Date.now();
+            const tempoSemAtualizacao = agora - ultimaAtualizacao;
+            
+            // Se não atualizou por mais de 15 segundos, força nova busca
+            if (tempoSemAtualizacao > 15000) {
+                console.warn('Sistema pode estar travado, forçando nova busca...');
+                fetchStatus();
+            }
+        }
         
-        // Carrega status inicial
-        fetchStatus();
+        // Inicia o sistema
+        console.log('Iniciando sistema de monitoramento...');
+        fetchStatus(); // Busca inicial
+        
+        // Atualiza a cada 3 segundos
+        const intervaloPrincipal = setInterval(fetchStatus, 3000);
+        
+        // Verificação de segurança a cada 10 segundos
+        const intervaloSeguranca = setInterval(verificarSistema, 10000);
+        
+        // Debug: mostra no console quando a página está ativa
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                console.log('Página visível, forçando atualização...');
+                fetchStatus();
+            }
+        });
+        
+        console.log('Sistema iniciado com sucesso!');
     </script>
 </body>
 </html>
