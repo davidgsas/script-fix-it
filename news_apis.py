@@ -103,7 +103,7 @@ class NewsAPIs:
             cursor = conn.cursor()
             
             # Busca artigos recentes
-            query = "SELECT id, title, source_name, main_image_url, content_text FROM articles WHERE datetime(data_insert) >= datetime(?)"
+            query = "SELECT id, title, source_name, main_image_url, content_text FROM articles WHERE datetime(data_inserted) >= datetime(?)"
             cursor.execute(query, (ponto_de_corte_str,))
             articles = cursor.fetchall()
             conn.close()
