@@ -2,6 +2,7 @@
 import os
 import getpass
 import threading
+import logging
 import google.generativeai as genai
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
