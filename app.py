@@ -251,8 +251,15 @@ def atualizar_config():
 # --- INICIALIZAÇÃO ---
 
 if __name__ == "__main__":
+    print("🚀 Iniciando aplicação...")
+    
+    print("📦 Configurando banco de dados...")
     setup_database()
+    
+    print("⚙️  Carregando configurações...")
     config = carregar_config()
+    
+    print(f"🔍 Verificando configurações: insta_user={bool(config.get('insta_user'))}, gnews_api_key={bool(config.get('gnews_api_key'))}")
     
     # Verifica se tem configurações básicas
     if not config.get("insta_user") or not config.get("gnews_api_key"):
@@ -264,7 +271,7 @@ if __name__ == "__main__":
         config["google_api_key"] = input("✨ Chave da API Google Gemini: ")
         salvar_config(config)
     
-    print("\nObrigado! Configurando e iniciando o bot...")
+    print("\n✅ Obrigado! Configurando e iniciando o bot...")
     
     # Login no Instagram
     if instagram.login_com_sessao():
