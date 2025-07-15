@@ -44,30 +44,28 @@ class MediaProcessor:
             img_fundo = Image.open(BytesIO(requests.get(url_imagem, timeout=10).content))
             img_fundo = img_fundo.convert("RGBA")
             
-            # Calcular dimensões proporcionais
+            # Calcular dimensões mantendo proporção
             img_w, img_h = img_fundo.size
-            target_ratio = W / H
-            img_ratio = img_w / img_h
             
-            # Redimensionar mantendo proporção (até 20% de ajuste se necessário)
-            if img_ratio > target_ratio:
-                # Imagem mais larga - ajustar pela altura
-                new_h = H
-                new_w = int(img_w * (H / img_h))
-                # Se muito larga, reduzir até 20%
-                if new_w > W * 1.2:
-                    new_w = int(W * 1.2)
-                    new_h = int(img_h * (new_w / img_w))
-            else:
-                # Imagem mais alta - ajustar pela largura
-                new_w = W
-                new_h = int(img_h * (W / img_w))
-                # Se muito alta, reduzir até 20%
-                if new_h > H * 1.2:
-                    new_h = int(H * 1.2)
-                    new_w = int(img_w * (new_h / img_h))
+            # Calcular o fator de escala para cobrir completamente o target
+            scale_x = W / img_w
+            scale_y = H / img_h
             
-            # Redimensionar a imagem
+            # Usar o maior fator de escala para garantir que a imagem cubra todo o target
+            # Isso pode resultar em crop, mas evita distorção
+            scale = max(scale_x, scale_y)
+            
+            # Permitir redução de até 20% se necessário para melhor ajuste
+            if scale > 1.2:
+                scale = 1.2
+            elif scale < 0.8:
+                scale = 0.8
+            
+            # Calcular novas dimensões mantendo proporção
+            new_w = int(img_w * scale)
+            new_h = int(img_h * scale)
+            
+            # Redimensionar a imagem SEM distorção
             img_fundo = img_fundo.resize((new_w, new_h), Image.Resampling.LANCZOS)
             
             # Criar imagem final e centralizar com crop
