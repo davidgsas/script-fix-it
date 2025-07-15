@@ -36,6 +36,13 @@ class AIServices:
     
     @staticmethod
     def gerar_titulo_canonico(titulo, conteudo):
+        # Trata caso do conteúdo ser None ou vazio
+        conteudo_texto = ""
+        if conteudo and len(conteudo.strip()) > 0:
+            conteudo_texto = conteudo[:300]
+        else:
+            conteudo_texto = "Conteúdo não disponível"
+            
         prompt = f"""Você é um indexador de notícias da agência Reuters. Sua tarefa é ler um título e o início de um artigo e criar uma manchete canônica, factual e ultra-resumida (máximo 10 palavras) que capture a essência do evento.
 
 O objetivo é que notícias de fontes diferentes sobre o MESMO evento resultem em manchetes canônicas IDÊNTICAS. Padronize termos (ex: 'EUA' e 'Estados Unidos' devem virar 'EUA'). Remova nomes de fontes e linguagem opinativa.
@@ -47,7 +54,7 @@ Exemplo de Entrada 2: 'Fábrica de Gordura Pré-Histórica Operava Há 125.000 A
 Saída Esperada para Ambos: 'Descoberta fábrica de gordura Neandertal de 125.000 anos na Alemanha'
 
 Título real: "{titulo}"
-Início do conteúdo: "{conteudo[:300]}..."
+Início do conteúdo: "{conteudo_texto}..."
 
 Manchete Canônica:"""
         
@@ -56,6 +63,13 @@ Manchete Canônica:"""
     
     @staticmethod
     def filtrar_relevancia(titulo, conteudo):
+        # Trata caso do conteúdo ser None ou vazio
+        conteudo_texto = ""
+        if conteudo and len(conteudo.strip()) > 0:
+            conteudo_texto = conteudo[:700]
+        else:
+            conteudo_texto = "Conteúdo não disponível"
+            
         prompt = f"""Você é um editor de pauta sênior e cético. Analise o título e o conteúdo para determinar se é uma notícia genuína ou conteúdo promocional/marketing/caça-cliques.
 
 REPROVE conteúdo de baixo valor. APROVE apenas notícias relevantes.
@@ -65,7 +79,7 @@ Responda APENAS com APROVADA ou REPROVADA.
 Texto:
 ---
 Título: {titulo}
-Conteúdo: {conteudo[:700]}...
+Conteúdo: {conteudo_texto}...
 ---
 
 Veredito:"""
@@ -145,6 +159,13 @@ Título refinado:"""
     
     @staticmethod
     def categorizar_noticia(titulo, conteudo):
+        # Trata caso do conteúdo ser None ou vazio
+        conteudo_texto = ""
+        if conteudo and len(conteudo.strip()) > 0:
+            conteudo_texto = conteudo[:500]
+        else:
+            conteudo_texto = "Conteúdo não disponível"
+            
         prompt = f"""Você é um classificador de conteúdo especialista. Sua tarefa é ler o título e o conteúdo de uma notícia e criar uma categoria concisa e específica para ela, com no máximo duas palavras.
 
 Exemplo: 'Fórmula 1', 'Inteligência Artificial', 'Cinema', 'Mercado Financeiro', 'Política Nacional'.
@@ -153,7 +174,7 @@ Retorne APENAS o nome da categoria.
 
 Texto:
 Título: "{titulo}"
-Conteúdo: "{conteudo}"
+Conteúdo: "{conteudo_texto}"
 
 Categoria:"""
         
