@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
 import google.generativeai as genai
 import logging
 import re
 from config import PRECO_INPUT_USD_1M_TOKENS, PRECO_OUTPUT_USD_1M_TOKENS, carregar_config
 
-# Contador de custo da sessão atual
 custo_sessao_atual = {"total_custo_usd": 0.0}
 
 class AIServices:
-    """Serviços de IA usando Google Gemini"""
     
     @staticmethod
     def _chamar_gemini(prompt, funcao_nome):
-        """Chama a API do Gemini e calcula custos"""
         cfg = carregar_config()
         
         if not cfg.get("google_api_key") or cfg.get("google_api_key") == "SUA_CHAVE_API_DO_GEMINI_AQUI":
@@ -40,7 +36,6 @@ class AIServices:
     
     @staticmethod
     def gerar_titulo_canonico(titulo, conteudo):
-        """Gera título canônico para detecção de duplicatas"""
         prompt = f"""Você é um indexador de notícias da agência Reuters. Sua tarefa é ler um título e o início de um artigo e criar uma manchete canônica, factual e ultra-resumida (máximo 10 palavras) que capture a essência do evento.
 
 O objetivo é que notícias de fontes diferentes sobre o MESMO evento resultem em manchetes canônicas IDÊNTICAS. Padronize termos (ex: 'EUA' e 'Estados Unidos' devem virar 'EUA'). Remova nomes de fontes e linguagem opinativa.
@@ -61,7 +56,6 @@ Manchete Canônica:"""
     
     @staticmethod
     def filtrar_relevancia(titulo, conteudo):
-        """Filtra se a notícia é relevante ou spam/marketing"""
         prompt = f"""Você é um editor de pauta sênior e cético. Analise o título e o conteúdo para determinar se é uma notícia genuína ou conteúdo promocional/marketing/caça-cliques.
 
 REPROVE conteúdo de baixo valor. APROVE apenas notícias relevantes.
@@ -87,7 +81,6 @@ Veredito:"""
     
     @staticmethod
     def traduzir_texto(texto, idioma_original='Inglês'):
-        """Traduz texto para português"""
         if not texto:
             return texto, 0.0
             
@@ -102,7 +95,6 @@ Retorne apenas o texto traduzido:
     
     @staticmethod
     def reescrever_legenda(texto_original):
-        """Reescreve texto como legenda do Instagram"""
         if not texto_original:
             return texto_original, 0.0
             
@@ -137,7 +129,6 @@ Texto reescrito:"""
     
     @staticmethod
     def melhorar_titulo(titulo_original):
-        """Refina o título da notícia"""
         if not titulo_original:
             return titulo_original, 0.0
             
@@ -154,7 +145,6 @@ Título refinado:"""
     
     @staticmethod
     def categorizar_noticia(titulo, conteudo):
-        """Categoriza a notícia"""
         prompt = f"""Você é um classificador de conteúdo especialista. Sua tarefa é ler o título e o conteúdo de uma notícia e criar uma categoria concisa e específica para ela, com no máximo duas palavras.
 
 Exemplo: 'Fórmula 1', 'Inteligência Artificial', 'Cinema', 'Mercado Financeiro', 'Política Nacional'.
@@ -172,7 +162,6 @@ Categoria:"""
     
     @staticmethod
     def gerar_hashtags(texto_para_seo):
-        """Gera hashtags relevantes"""
         if not texto_para_seo:
             return "", 0.0
             
