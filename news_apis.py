@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 import requests
 import logging
 from config import carregar_config
 
 class NewsAPIs:
-    """Classe para buscar notícias de diferentes APIs"""
     
     @staticmethod
     def get_gnews(categoria, idioma, pais):
-        """Busca notícias na API GNews"""
         cfg = carregar_config()
         
         if not cfg.get("gnews_api_key"):
@@ -36,17 +33,14 @@ class NewsAPIs:
     
     @staticmethod
     def get_newsdata(categoria, idioma, pais):
-        """Busca notícias na API NewsData"""
         cfg = carregar_config()
         
         if not cfg.get("newsdata_api_key"):
             return []
         
-        # Mapeamentos para compatibilidade
         lang_map = {'pt': 'pt', 'en': 'en'}
         country_map = {'br': 'br', 'us': 'us'}
         
-        # Ajustes de categoria
         if categoria == 'breaking-news':
             categoria = 'top'
         if categoria == 'nation':
@@ -74,7 +68,6 @@ class NewsAPIs:
     
     @staticmethod
     def buscar_todas_noticias():
-        """Busca notícias de todas as APIs configuradas"""
         cfg = carregar_config()
         
         if not cfg.get("apis_ativas") or not cfg.get("idiomas_busca") or not cfg.get("categorias_ativas"):
@@ -95,7 +88,6 @@ class NewsAPIs:
                     elif api == 'newsdata':
                         artigos = NewsAPIs.get_newsdata(categoria, idioma, pais)
                     
-                    # Adiciona metadados
                     for artigo in artigos:
                         artigo['api_fonte'] = api
                         artigo['idioma_original'] = idioma
