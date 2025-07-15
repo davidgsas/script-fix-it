@@ -15,8 +15,7 @@ from news_apis import NewsAPIs
 from instagram import InstagramManager
 from media import MediaProcessor
 
-# Configuração inicial
-setup_logging()
+# Configuração inicial será feita no main
 app = Flask(__name__)
 
 # Instâncias globais
@@ -251,33 +250,46 @@ def atualizar_config():
 # --- INICIALIZAÇÃO ---
 
 if __name__ == "__main__":
-    print("🚀 Iniciando aplicação...")
+    print("🚀 INICIANDO BOT DE INSTAGRAM...")
+    
+    print("⚙️ Configurando logging...")
+    setup_logging()
     
     print("📦 Configurando banco de dados...")
     setup_database()
     
-    print("⚙️  Carregando configurações...")
+    print("🔧 Carregando configurações...")
     config = carregar_config()
     
-    print(f"🔍 Verificando configurações: insta_user={bool(config.get('insta_user'))}, gnews_api_key={bool(config.get('gnews_api_key'))}")
+    print(f"📋 Status das configurações:")
+    print(f"   - insta_user: {'✅' if config.get('insta_user') else '❌'}")
+    print(f"   - gnews_api_key: {'✅' if config.get('gnews_api_key') else '❌'}")
     
     # Verifica se tem configurações básicas
     if not config.get("insta_user") or not config.get("gnews_api_key"):
-        print("Arquivo de configuração não encontrado ou incompleto. Solicitando informações...")
+        print("\n🔑 CONFIGURAÇÕES NECESSÁRIAS:")
+        print("Precisamos configurar as APIs e credenciais...")
         config["insta_user"] = input("👤 Usuário do Instagram: ")
-        config["insta_pass"] = getpass.getpass("🔑 Senha do Instagram (não aparecerá na tela): ")
+        config["insta_pass"] = getpass.getpass("🔑 Senha do Instagram: ")
         config["gnews_api_key"] = input("📰 Chave da API GNews: ")
         config["newsdata_api_key"] = input("📊 Chave da API NewsData.io: ")
         config["google_api_key"] = input("✨ Chave da API Google Gemini: ")
         salvar_config(config)
+        print("✅ Configurações salvas!")
     
-    print("\n✅ Obrigado! Configurando e iniciando o bot...")
+    print("\n📱 Fazendo login no Instagram...")
     
     # Login no Instagram
     if instagram.login_com_sessao():
+        print("✅ Login no Instagram realizado com sucesso!")
+        
         # Configura Gemini
         if config.get("google_api_key"):
+            import google.generativeai as genai
             genai.configure(api_key=config.get("google_api_key"))
+            print("✅ Google Gemini configurado!")
+        
+        print("⏰ Configurando agendamento de tarefas...")
         
         # Agenda tarefas
         scheduler.add_job(
@@ -293,11 +305,16 @@ if __name__ == "__main__":
             id='postador_fila'
         )
         
+        print("🔍 Iniciando primeira busca de notícias...")
         # Inicia primeira busca e scheduler
         threading.Thread(target=processar_noticias).start()
         scheduler.start()
         
-        logging.info("Servidor web e agendadores iniciados. Acesse http://127.0.0.1:8080")
+        print("\n🌐 Servidor web iniciado!")
+        print("🔗 Acesse: http://127.0.0.1:8080")
+        print("✨ Bot está funcionando! Pressione Ctrl+C para parar.\n")
+        
         app.run(host='0.0.0.0', port=8080, debug=False)
     else:
-        logging.error("FALHA GERAL: Login no Instagram falhou. Servidor não iniciado.")
+        print("❌ FALHA: Login no Instagram falhou. Servidor não iniciado.")
+        print("   Verifique suas credenciais e tente novamente.")
