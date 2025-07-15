@@ -42,7 +42,53 @@ class MediaProcessor:
         
         try:
             img_fundo = Image.open(BytesIO(requests.get(url_imagem, timeout=10).content))
-            img_fundo = img_fundo.convert("RGBA").resize((W, H))
+            img_fundo = img_fundo.convert("RGBA")
+            
+            # Calcular dimensões proporcionais
+            img_w, img_h = img_fundo.size
+            target_ratio = W / H
+            img_ratio = img_w / img_h
+            
+            # Redimensionar mantendo proporção (até 20% de ajuste se necessário)
+            if img_ratio > target_ratio:
+                # Imagem mais larga - ajustar pela altura
+                new_h = H
+                new_w = int(img_w * (H / img_h))
+                # Se muito larga, reduzir até 20%
+                if new_w > W * 1.2:
+                    new_w = int(W * 1.2)
+                    new_h = int(img_h * (new_w / img_w))
+            else:
+                # Imagem mais alta - ajustar pela largura
+                new_w = W
+                new_h = int(img_h * (W / img_w))
+                # Se muito alta, reduzir até 20%
+                if new_h > H * 1.2:
+                    new_h = int(H * 1.2)
+                    new_w = int(img_w * (new_h / img_h))
+            
+            # Redimensionar a imagem
+            img_fundo = img_fundo.resize((new_w, new_h), Image.Resampling.LANCZOS)
+            
+            # Criar imagem final e centralizar com crop
+            img_final = Image.new('RGBA', (W, H), (0, 0, 0, 255))
+            
+            # Calcular posição para centralizar
+            x_offset = (W - new_w) // 2
+            y_offset = (H - new_h) // 2
+            
+            # Se a imagem redimensionada for maior que o alvo, fazer crop centralizado
+            if new_w > W or new_h > H:
+                crop_x = max(0, (new_w - W) // 2)
+                crop_y = max(0, (new_h - H) // 2)
+                img_fundo = img_fundo.crop((crop_x, crop_y, crop_x + W, crop_y + H))
+                x_offset = 0
+                y_offset = 0
+            
+            # Colar a imagem centralizada
+            img_final.paste(img_fundo, (x_offset, y_offset))
+            img_fundo = img_final
+            
         except Exception as e:
             logging.error(f"[IMAGEM] Falha ao carregar imagem {url_imagem}. Erro: {e}")
             return None
