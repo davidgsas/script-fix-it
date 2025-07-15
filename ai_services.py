@@ -16,7 +16,7 @@ class AIServices:
             return None, 0.0
         
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            model = genai.GenerativeModel('gemini-2.5-flash-lite-preview-06-17')
             response = model.generate_content(prompt)
             custo_usd = 0.0
             
@@ -70,9 +70,35 @@ Manchete Canônica:"""
         else:
             conteudo_texto = "Conteúdo não disponível"
             
-        prompt = f"""Você é um editor de pauta sênior e cético. Analise o título e o conteúdo para determinar se é uma notícia genuína ou conteúdo promocional/marketing/caça-cliques.
+        prompt = f"""Você é um editor de pauta sênior, extremamente criterioso e cético. Sua função é analisar o título e o conteúdo de um artigo para determinar se é uma notícia genuína ou se é conteúdo promocional, marketing, 'caça-cliques' ou de baixo valor jornalístico.
 
-REPROVE conteúdo de baixo valor. APROVE apenas notícias relevantes.
+REPROVE o conteúdo se ele se encaixar em qualquer uma destas categorias:
+
+Anúncios, publieditoriais ou marketing disfarçado de notícia.
+
+Venda ou sugestão explícita de cursos, webinars, e-books ou produtos.
+
+Listas de "dicas" ou "curiosidades" de baixo impacto (ex: '5 formas de limpar seu celular', 'o segredo para descascar um ovo').
+
+Notícias "bestas", fofocas de celebridades ou entretenimento de baixo valor que não se encaixam em editorias sérias.
+
+Resultados de loteria, horóscopo, ou conteúdo sobre sorte e previsões.
+
+Artigos de opinião pessoal sem base em fatos concretos.
+
+Qualquer noticia que nao seja de jogos extremamente conhecidos como GTA.
+
+APROVE apenas se for uma notícia genuína sobre:
+
+Eventos globais ou nacionais significativos.
+
+Anúncios de produtos ou tecnologias de grandes empresas (ex: Apple, Google, NASA).
+
+Descobertas científicas ou avanços médicos importantes.
+
+Análises sobre o mercado financeiro e economia.
+
+Resultados e eventos de esportes relevantes.
 
 Responda APENAS com APROVADA ou REPROVADA.
 
@@ -114,7 +140,7 @@ Retorne apenas o texto traduzido:
             
         prompt = f"""Aja como um copywriter sênior da página @noticiasbr.ai. Sua tarefa é transformar o artigo de notícia a seguir em uma legenda de Instagram magnética e de fácil leitura.
 
-O formato da sua resposta deve ser EXATAMENTE: um parágrafo de resumo (máx 100 palavras) seguido do marcador especial `|||` e depois um gancho final (uma frase ou pergunta curta e provocativa).
+O formato da sua resposta deve ser EXATAMENTE: um parágrafo de resumo (máx 250 palavras) seguido do marcador especial `|||` e depois um gancho final (uma frase ou pergunta curta e provocativa).
 
 NUNCA use marcadores como '1.' ou '-'.
 
@@ -162,13 +188,15 @@ Título refinado:"""
         # Trata caso do conteúdo ser None ou vazio
         conteudo_texto = ""
         if conteudo and len(conteudo.strip()) > 0:
-            conteudo_texto = conteudo[:500]
+            conteudo_texto = conteudo
         else:
             conteudo_texto = "Conteúdo não disponível"
             
-        prompt = f"""Você é um classificador de conteúdo especialista. Sua tarefa é ler o título e o conteúdo de uma notícia e criar uma categoria concisa e específica para ela, com no máximo duas palavras.
+        prompt = f"""Você é um classificador de conteúdo especialista. Sua tarefa é ler o título e o conteúdo de uma notícia e classificá-la na categoria mais apropriada de uma lista pré-definida.
 
-Exemplo: 'Fórmula 1', 'Inteligência Artificial', 'Cinema', 'Mercado Financeiro', 'Política Nacional'.
+A lista de categorias permitidas é: Política, Economia, Ciência, IA, Tecnologia, Educação, Saúde, Governo, Mundo, Guerra.
+
+Analise o texto e retorne APENAS o nome de UMA categoria da lista. Se nenhuma se encaixar perfeitamente, escolha a mais próxima ou 'Mundo'.
 
 Retorne APENAS o nome da categoria.
 
