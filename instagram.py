@@ -7,29 +7,34 @@ from config import carregar_config, SESSION_FILE
 
 class InstagramManager:
     
-    def __init__(self):
+    def __init__(self, session_file=None):
         self.client = Client()
+        self.session_file = session_file or SESSION_FILE
     
-    def login_com_sessao(self):
-        cfg = carregar_config()
+    def login_com_sessao(self, username=None, password=None):
+        # Se não foram fornecidos, usa da configuração global
+        if not username or not password:
+            cfg = carregar_config()
+            username = cfg.get("insta_user")
+            password = cfg.get("insta_pass")
         
         try:
-            if os.path.exists(SESSION_FILE):
-                self.client.load_settings(SESSION_FILE)
-                logging.info("[INSTAGRAM] Sessão de login carregada.")
+            if os.path.exists(self.session_file):
+                self.client.load_settings(self.session_file)
+                logging.info(f"[INSTAGRAM] Sessão de login carregada: {self.session_file}")
             else:
                 raise Exception("Sem sessão")
             
-            self.client.login(cfg["insta_user"], cfg["insta_pass"])
+            self.client.login(username, password)
             self.client.get_timeline_feed()
             
         except Exception as e:
             logging.warning(f"[INSTAGRAM] Não foi possível usar a sessão ({e}). Realizando login completo...")
             
             try:
-                self.client.login(cfg["insta_user"], cfg["insta_pass"])
-                self.client.dump_settings(SESSION_FILE)
-                logging.info("[INSTAGRAM] Login completo realizado e nova sessão salva.")
+                self.client.login(username, password)
+                self.client.dump_settings(self.session_file)
+                logging.info(f"[INSTAGRAM] Login completo realizado e nova sessão salva: {self.session_file}")
                 
             except Exception as e2:
                 logging.error(f"[INSTAGRAM] ERRO CRÍTICO DE LOGIN: {e2}")

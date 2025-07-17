@@ -85,11 +85,14 @@ class NewsAPIs:
             return []
     
     @staticmethod
-    def get_local_news():
+    def get_local_news(pasta_feed=None):
         """
         Busca notícias via API REST do servidor interno
         """
         api_url = 'http://10.100.5.56:8000/api/feed'
+        if pasta_feed:
+            api_url += f'?pasta={pasta_feed}'
+        
         logging.info(f"[BUSCA] Buscando via API REST: {api_url}")
         
         try:
@@ -136,23 +139,28 @@ class NewsAPIs:
             return []
     
     @staticmethod
-    def buscar_todas_noticias():
-        cfg = carregar_config()
+    def buscar_todas_noticias(agent_config=None):
+        if agent_config is None:
+            cfg = carregar_config()
+        else:
+            cfg = agent_config
         
         if not cfg.get("apis_ativas") or not cfg.get("idiomas_busca") or not cfg.get("categorias_ativas"):
             return []
         
-        logging.info(f"--- [BUSCA] Iniciando ciclo de busca nas APIs {cfg['apis_ativas']} ---")
+        pasta_feed = cfg.get("pasta_feed", "geral")
+        logging.info(f"--- [BUSCA] Iniciando ciclo de busca nas APIs {cfg['apis_ativas']} (pasta: {pasta_feed}) ---")
         todas_noticias = []
         
         for api in cfg["apis_ativas"]:
-            # Condição especial para SQLite local
+            # Condição especial para API local
             if api == 'local_db':
-                artigos = NewsAPIs.get_local_news()
+                artigos = NewsAPIs.get_local_news(pasta_feed)
                 for artigo in artigos:
                     artigo['api_fonte'] = 'local_db'
                     artigo['idioma_original'] = 'pt'  # Assumindo português
                     artigo['categoria_busca'] = 'local'
+                    artigo['pasta_feed'] = pasta_feed
                 todas_noticias.extend(artigos)
                 continue  # Pula para próxima API
             
