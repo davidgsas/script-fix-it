@@ -87,42 +87,52 @@ class NewsAPIs:
     @staticmethod
     def get_local_news():
         """
-        Busca notícias do banco SQLite local dos últimos 30 minutos
+        Busca notícias via API REST do servidor interno
         """
-        db_path = '/Users/davidgabriel/hubbots/scrapernews/articles.db'
-        logging.info(f"[BUSCA] Buscando no banco SQLite local: {db_path}")
+        api_url = 'http://10.100.5.56:8000/api/feed'
+        logging.info(f"[BUSCA] Buscando via API REST: {api_url}")
         
         try:
+            response = requests.get(api_url, timeout=15)
+            response.raise_for_status()
+            articles = response.json()
+            
             # Filtro temporal - últimos 30 minutos
             ponto_de_corte = datetime.now() - timedelta(minutes=30)
-            ponto_de_corte_str = ponto_de_corte.strftime('%Y-%m-%d %H:%M:%S')
+            noticias_filtradas = []
             
-            # Conecta ao banco
-            conn = sqlite3.connect(db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+            for article in articles:
+                date_inserted_str = article.get("date_inserted")
+                if not date_inserted_str:
+                    continue
+                
+                # Converte a data ISO 8601 para datetime
+                try:
+                    date_inserted_obj = datetime.fromisoformat(date_inserted_str.replace('Z', '+00:00'))
+                    # Remove timezone info para comparar com datetime local
+                    date_inserted_obj = date_inserted_obj.replace(tzinfo=None)
+                except ValueError:
+                    # Se houver erro na conversão, pula o artigo
+                    continue
+                
+                if date_inserted_obj >= ponto_de_corte:
+                    noticias_filtradas.append(article)
             
-            # Busca artigos recentes
-            query = "SELECT id, title, source_name, main_image_url, content_text FROM articles WHERE datetime(date_inserted) >= datetime(?)"
-            cursor.execute(query, (ponto_de_corte_str,))
-            articles = cursor.fetchall()
-            conn.close()
-            
-            logging.info(f"[FILTRO] SQLite Local: {len(articles)} artigos encontrados (últimos 30min).")
+            logging.info(f"[FILTRO] API REST Local: {len(articles)} recebidos, {len(noticias_filtradas)} aprovados (últimos 30min).")
             
             return [{
-                "title": article["title"],
-                "description": None,  # SQLite não tem description
-                "content": article["content_text"],
-                "image": article["main_image_url"],
-                "source": {"name": article["source_name"]}
-            } for article in articles]
+                "title": article.get("title"),
+                "description": None,  # API não retorna description
+                "content": article.get("content_text"),
+                "image": article.get("main_image_url"),
+                "source": {"name": article.get("source_name")}
+            } for article in noticias_filtradas]
             
-        except sqlite3.Error as e:
-            logging.error(f"[BUSCA] ERRO SQLite: {e}")
+        except requests.RequestException as e:
+            logging.error(f"[BUSCA] ERRO na requisição para API REST: {e}")
             return []
         except Exception as e:
-            logging.error(f"[BUSCA] ERRO inesperado no SQLite: {e}")
+            logging.error(f"[BUSCA] ERRO inesperado na API REST: {e}")
             return []
     
     @staticmethod
