@@ -64,6 +64,13 @@ def processar_noticias():
             "semantic_hash": semantic_hash
         }
         
+        # Verifica duplicata por título primeiro
+        if Database.verificar_titulo_duplicado(titulo_original):
+            dados_para_historico.update({"titulo_refinado": f"[DUPLICATA TÍTULO] {titulo_original[:150]}"})
+            Database.registrar_no_historico(dados_para_historico, "REJEITADA", "Título já processado")
+            logging.info(f"[FILTRO] Notícia ignorada - título já processado: {titulo_original[:100]}...")
+            continue
+        
         # Verifica duplicata semântica
         if Database.verificar_duplicata_semantica(semantic_hash):
             dados_para_historico.update({"titulo_refinado": f"[DUPLICATA] {titulo_original[:150]}"})
@@ -378,9 +385,8 @@ if __name__ == "__main__":
             id='postador_fila'
         )
         
-        print("🔍 Iniciando primeira busca de notícias...")
-        # Inicia primeira busca e scheduler
-        threading.Thread(target=processar_noticias).start()
+        print("⏰ Agendamento configurado. Primeira busca acontecerá no intervalo programado.")
+        # Inicia apenas o scheduler, sem busca inicial
         scheduler.start()
         
         print("\n🌐 Servidor web iniciado!")

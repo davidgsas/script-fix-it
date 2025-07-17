@@ -203,3 +203,27 @@ class Database:
         """).fetchall()]
         conn.close()
         return titulos
+    
+    @staticmethod
+    def verificar_titulo_duplicado(titulo_original):
+        """Verifica se um título similar já existe na fila ou histórico"""
+        if not titulo_original:
+            return True
+            
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Busca na fila primeiro
+        cursor.execute("SELECT titulo_original FROM fila_postagem WHERE titulo_original = ?", (titulo_original,))
+        if cursor.fetchone():
+            conn.close()
+            return True
+        
+        # Busca no histórico
+        cursor.execute("SELECT titulo_original FROM historico WHERE titulo_original = ?", (titulo_original,))
+        if cursor.fetchone():
+            conn.close()
+            return True
+            
+        conn.close()
+        return False
