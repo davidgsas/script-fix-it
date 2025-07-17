@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar {{ config.agent_name or 'Agente ' + agent_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4><i class="fas fa-cog"></i> Configurar Agente</h4>
+                            <a href="/agente/{{ agent_id }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/salvar_config/{{ agent_id }}">
+                            <!-- Configurações Básicas -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-info-circle"></i> Informações Básicas</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nome do Agente</label>
+                                    <input type="text" class="form-control" name="agent_name" 
+                                           value="{{ config.agent_name or '' }}" placeholder="Agente {{ agent_id }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Pasta de Notícias</label>
+                                    <select class="form-select" name="pasta_feed" required>
+                                        <option value="geral" {{ 'selected' if config.pasta_feed == 'geral' else '' }}>Geral</option>
+                                        <option value="esportes" {{ 'selected' if config.pasta_feed == 'esportes' else '' }}>Esportes</option>
+                                        <option value="tecnologia" {{ 'selected' if config.pasta_feed == 'tecnologia' else '' }}>Tecnologia</option>
+                                        <option value="politica" {{ 'selected' if config.pasta_feed == 'politica' else '' }}>Política</option>
+                                        <option value="economia" {{ 'selected' if config.pasta_feed == 'economia' else '' }}>Economia</option>
+                                        <option value="saude" {{ 'selected' if config.pasta_feed == 'saude' else '' }}>Saúde</option>
+                                        <option value="entretenimento" {{ 'selected' if config.pasta_feed == 'entretenimento' else '' }}>Entretenimento</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Configurações do Instagram -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fab fa-instagram"></i> Instagram</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Usuário</label>
+                                    <input type="text" class="form-control" name="insta_user" 
+                                           value="{{ config.insta_user or '' }}" placeholder="seu_usuario">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Senha</label>
+                                    <input type="password" class="form-control" name="insta_pass" 
+                                           value="{{ config.insta_pass or '' }}" placeholder="sua_senha">
+                                </div>
+                            </div>
+
+                            <!-- APIs -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-plug"></i> APIs de Notícias</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="apis" value="servidor_local"
+                                                       {{ 'checked' if 'servidor_local' in config.get('apis_ativas', []) else '' }}>
+                                                <label class="form-check-label">Servidor Local</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="apis" value="gnews"
+                                                       {{ 'checked' if 'gnews' in config.get('apis_ativas', []) else '' }}>
+                                                <label class="form-check-label">GNews</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="apis" value="newsdata"
+                                                       {{ 'checked' if 'newsdata' in config.get('apis_ativas', []) else '' }}>
+                                                <label class="form-check-label">NewsData.io</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Categorias -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-tags"></i> Categorias</h5>
+                                    <div class="row">
+                                        {% for categoria in ['general', 'business', 'entertainment', 'health', 'science', 'sports', 'technology'] %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="categorias" value="{{ categoria }}"
+                                                       {{ 'checked' if categoria in config.get('categorias_ativas', []) else '' }}>
+                                                <label class="form-check-label">{{ categoria.title() }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Idiomas -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-globe"></i> Idiomas</h5>
+                                    <div class="row">
+                                        {% for idioma in [('pt', 'Português'), ('en', 'Inglês'), ('es', 'Espanhol')] %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="idiomas" value="{{ idioma[0] }}"
+                                                       {{ 'checked' if idioma[0] in config.get('idiomas_busca', []) else '' }}>
+                                                <label class="form-check-label">{{ idioma[1] }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Intervalos -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-clock"></i> Intervalos (minutos)</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Intervalo de Busca</label>
+                                    <input type="number" class="form-control" name="intervalo_busca" 
+                                           value="{{ config.intervalo_busca or 15 }}" min="5" max="120">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Intervalo de Post</label>
+                                    <input type="number" class="form-control" name="intervalo_post" 
+                                           value="{{ config.intervalo_post or 30 }}" min="10" max="480">
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="usar_intervalo_aleatorio"
+                                               {{ 'checked' if config.get('usar_intervalo_aleatorio') else '' }}>
+                                        <label class="form-check-label">Usar intervalo aleatório para posts</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Intervalo Mínimo (horas)</label>
+                                    <input type="number" class="form-control" name="intervalo_post_min" 
+                                           value="{{ config.intervalo_post_min or 8 }}" min="1" max="23">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Intervalo Máximo (horas)</label>
+                                    <input type="number" class="form-control" name="intervalo_post_max" 
+                                           value="{{ config.intervalo_post_max or 10 }}" min="2" max="24">
+                                </div>
+                            </div>
+
+                            <!-- Configurações Avançadas -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-sliders-h"></i> Avançado</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Opacidade da Imagem (%)</label>
+                                    <input type="range" class="form-range" name="opacidade" 
+                                           value="{{ (config.opacidade or 0.3) * 100 }}" min="10" max="100" step="10">
+                                    <div class="text-center">
+                                        <small class="text-muted">10% - 100%</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save"></i> Salvar Configurações
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
