@@ -141,23 +141,35 @@ class NewsAPIs:
     @staticmethod
     def obter_pastas_disponiveis():
         """
-        Busca as pastas disponíveis no servidor local
+        Busca as pastas disponíveis no feed do servidor local
         """
-        api_url = 'http://10.100.5.56:8000/api/pasta'
+        api_url = 'http://10.100.5.56:8000/api/feed'
         
         logging.info(f"[CONFIG] Buscando pastas disponíveis: {api_url}")
         
         try:
-            response = requests.get(api_url, timeout=10)
+            response = requests.get(api_url, timeout=15)
             response.raise_for_status()
-            pastas = response.json()
+            articles = response.json()
             
-            logging.info(f"[CONFIG] Pastas encontradas: {pastas}")
-            return pastas
+            # Extrai valores únicos do campo 'pasta'
+            pastas_encontradas = set()
+            for article in articles:
+                pasta = article.get('pasta')
+                if pasta:
+                    pastas_encontradas.add(pasta)
+            
+            pastas_lista = sorted(list(pastas_encontradas))
+            logging.info(f"[CONFIG] Pastas encontradas: {pastas_lista}")
+            
+            # Se não encontrar nenhuma pasta, retorna lista padrão
+            if not pastas_lista:
+                return ['geral', 'esportes', 'tecnologia', 'politica', 'economia', 'saude', 'entretenimento']
+            
+            return pastas_lista
             
         except requests.RequestException as e:
             logging.error(f"[CONFIG] ERRO ao buscar pastas: {e}")
-            # Retorna pastas padrão em caso de erro
             return ['geral', 'esportes', 'tecnologia', 'politica', 'economia', 'saude', 'entretenimento']
         except Exception as e:
             logging.error(f"[CONFIG] ERRO inesperado ao buscar pastas: {e}")
