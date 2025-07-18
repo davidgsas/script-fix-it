@@ -143,7 +143,7 @@ class NewsAPIs:
         """
         Busca as pastas disponíveis no servidor local
         """
-        api_url = 'http://10.100.5.56:8000/api/pastas'
+        api_url = 'http://10.100.5.56:8000/api/pasta'
         
         logging.info(f"[CONFIG] Buscando pastas disponíveis: {api_url}")
         
