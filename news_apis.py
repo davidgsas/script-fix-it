@@ -128,7 +128,8 @@ class NewsAPIs:
                 "description": None,  # API não retorna description
                 "content": article.get("content_text"),
                 "image": article.get("main_image_url"),
-                "source": {"name": article.get("source_name")}
+                "source": {"name": article.get("source_name")},
+                "pasta": article.get("pasta")
             } for article in noticias_filtradas]
             
         except requests.RequestException as e:
