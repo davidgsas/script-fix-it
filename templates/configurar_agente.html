@@ -35,14 +35,15 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Pasta de Notícias</label>
                                     <select class="form-select" name="pasta_feed" required>
-                                        <option value="geral" {{ 'selected' if config.pasta_feed == 'geral' else '' }}>Geral</option>
-                                        <option value="esportes" {{ 'selected' if config.pasta_feed == 'esportes' else '' }}>Esportes</option>
-                                        <option value="tecnologia" {{ 'selected' if config.pasta_feed == 'tecnologia' else '' }}>Tecnologia</option>
-                                        <option value="politica" {{ 'selected' if config.pasta_feed == 'politica' else '' }}>Política</option>
-                                        <option value="economia" {{ 'selected' if config.pasta_feed == 'economia' else '' }}>Economia</option>
-                                        <option value="saude" {{ 'selected' if config.pasta_feed == 'saude' else '' }}>Saúde</option>
-                                        <option value="entretenimento" {{ 'selected' if config.pasta_feed == 'entretenimento' else '' }}>Entretenimento</option>
+                                        {% for pasta in pastas_disponiveis %}
+                                        <option value="{{ pasta }}" {{ 'selected' if config.pasta_feed == pasta else '' }}>
+                                            {{ pasta.title() }}
+                                        </option>
+                                        {% endfor %}
                                     </select>
+                                    <div class="form-text">
+                                        <small class="text-muted">Pastas carregadas do servidor local</small>
+                                    </div>
                                 </div>
                             </div>
 

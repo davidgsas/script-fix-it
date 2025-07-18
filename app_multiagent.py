@@ -71,8 +71,13 @@ def criar_agente():
 @app.route("/configurar/<agent_id>")
 def configurar_agente(agent_id):
     """Página de configuração de um agente"""
+    from news_apis import NewsAPIs
     config = carregar_config(agent_id)
-    return render_template("configurar_agente.html", agent_id=agent_id, config=config)
+    pastas_disponiveis = NewsAPIs.obter_pastas_disponiveis()
+    return render_template("configurar_agente.html", 
+                          agent_id=agent_id, 
+                          config=config, 
+                          pastas_disponiveis=pastas_disponiveis)
 
 @app.route("/salvar_config/<agent_id>", methods=['POST'])
 def salvar_config_agente(agent_id):

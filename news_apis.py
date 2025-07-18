@@ -139,6 +139,31 @@ class NewsAPIs:
             return []
     
     @staticmethod
+    def obter_pastas_disponiveis():
+        """
+        Busca as pastas disponíveis no servidor local
+        """
+        api_url = 'http://10.100.5.56:8000/api/pastas'
+        
+        logging.info(f"[CONFIG] Buscando pastas disponíveis: {api_url}")
+        
+        try:
+            response = requests.get(api_url, timeout=10)
+            response.raise_for_status()
+            pastas = response.json()
+            
+            logging.info(f"[CONFIG] Pastas encontradas: {pastas}")
+            return pastas
+            
+        except requests.RequestException as e:
+            logging.error(f"[CONFIG] ERRO ao buscar pastas: {e}")
+            # Retorna pastas padrão em caso de erro
+            return ['geral', 'esportes', 'tecnologia', 'politica', 'economia', 'saude', 'entretenimento']
+        except Exception as e:
+            logging.error(f"[CONFIG] ERRO inesperado ao buscar pastas: {e}")
+            return ['geral', 'esportes', 'tecnologia', 'politica', 'economia', 'saude', 'entretenimento']
+    
+    @staticmethod
     def buscar_todas_noticias(agent_config=None):
         if agent_config is None:
             cfg = carregar_config()
@@ -154,10 +179,10 @@ class NewsAPIs:
         
         for api in cfg["apis_ativas"]:
             # Condição especial para API local
-            if api == 'local_db':
+            if api == 'servidor_local':
                 artigos = NewsAPIs.get_local_news(pasta_feed)
                 for artigo in artigos:
-                    artigo['api_fonte'] = 'local_db'
+                    artigo['api_fonte'] = 'servidor_local'
                     artigo['idioma_original'] = 'pt'  # Assumindo português
                     artigo['categoria_busca'] = 'local'
                     artigo['pasta_feed'] = pasta_feed
